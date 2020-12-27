@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.779
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MostEficientRoute", "MostEficientRoute\MostEficientRoute.csproj", "{14DF69C0-1CE6-47AF-868E-C2EF238010F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenVisual", "GenVisual\GenVisual.csproj", "{44920AC8-6424-4B22-9976-B3E2D2858CD3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{14DF69C0-1CE6-47AF-868E-C2EF238010F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14DF69C0-1CE6-47AF-868E-C2EF238010F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14DF69C0-1CE6-47AF-868E-C2EF238010F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14DF69C0-1CE6-47AF-868E-C2EF238010F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44920AC8-6424-4B22-9976-B3E2D2858CD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44920AC8-6424-4B22-9976-B3E2D2858CD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44920AC8-6424-4B22-9976-B3E2D2858CD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44920AC8-6424-4B22-9976-B3E2D2858CD3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {37B3D039-F0A6-434B-89A2-9394F79CC455}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,448 @@
+﻿
+<link rel="stylesheet" href="~/GenVisual/LTE/plugins/fontawesome-free/css/all.min.css">
+<!-- Ionicons -->
+<link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+<!-- Theme style -->
+<link rel="stylesheet" href="~/GenVisual/LTE/dist/css/adminlte.min.css">
+<!-- Google Font: Source Sans Pro -->
+<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+
+
+<style>
+    #overlay {
+        position: fixed;
+        display: none;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0,0,0,0.5);
+        z-index: 2;
+        cursor: pointer;
+    }
+
+    #text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        font-size: 30px;
+        color: white;
+        transform: translate(-50%,-50%);
+        -ms-transform: translate(-50%,-50%);
+    }
+</style>
+
+
+<div id="overlay">
+
+    <div id="text"><div style="margin-left:22px" class="loader"></div> Calculando...</div>
+</div>
+
+
+
+<div style="display:flex">
+    <div id="DataDiv" style="width:15%;margin-left:10px">
+
+        <label>Qtde Pontos: </label><br />
+        <input id="target" style="width:70%" value="10" type="number" step="1" min="2" max="20" class="form-control" /><br />
+        <label>População: </label><br />
+        <input id="population" style="width:70%" value="100" type="number" step="1" min="5" max="500" class="form-control" /><br />
+        <label>N° Gerações: </label><br />
+        <input id="generation" style="width:70%" value="100" type="number" step="1" min="5" max="100" class="form-control" /><br />
+        <label>Taxa de Mutação (%): </label><br />
+        <input id="mutation" style="width:70%" value="10" type="number" step="1" min="1" max="100" class="form-control" /><br />
+
+        <button class="btn btn-primary" onclick="Execute()">Executar</button>
+
+
+
+    </div>
+    <div id="Analytics" style="width:80%;margin-left:10px">
+        <div style="display:flex">
+            <div id="Map">
+                <canvas id="MapCanvas" width="300" height="300" style="border:1px solid #000000"></canvas>
+            </div>
+            <div style="margin-left:12px;width:800px">
+                <select id="selectGen" onchange="changeGen()" class="form-control" style="width:200px"></select>
+                <br />
+
+                <div class="row">
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="info-box">
+                            
+                            <div class="info-box-content">
+                                <span class="info-box-text">Menor Distância</span>
+                                <span id="minLength" class="info-box-number">
+                                    0
+                                   
+                                </span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+                    <!-- fix for small devices only -->
+                    <div class="clearfix hidden-md-up"></div>
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="info-box mb-3">
+                           
+                            <div class="info-box-content">
+                                <span class="info-box-text">Distância Média</span>
+                                <span id="avgLength" class="info-box-number">0</span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="info-box mb-3">
+                           
+                            <div class="info-box-content">
+                                <span class="info-box-text">Maior Distância</span>
+                                <span id="maxLength" class="info-box-number">0</span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+                </div>
+
+
+
+                <div class="row">
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="info-box">
+                            
+                            <div class="info-box-content">
+                                <span class="info-box-text">Rotas Distintas</span>
+                                <span id="popDistinct" class="info-box-number">
+                                    0
+                                   
+                                </span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+                    <!-- fix for small devices only -->
+                    <div class="clearfix hidden-md-up"></div>
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="info-box mb-3">
+                           
+                            <div class="info-box-content">
+                                <span class="info-box-text">Variação</span>
+                                <span id="variacao" class="info-box-number">0.0 %</span>
+                                
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="info-box mb-3">
+                            
+                            <div class="info-box-content">
+                                <span class="info-box-text">Desvio Padrão</span>
+                                <span id="dp" class="info-box-number">0</span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+                </div>
+
+            </div>
+        </div>
+        <div id="Graph">
+            <div class="card card-primary card-outline">
+                <div class="card-header">
+                    <h3 class="card-title">Evolução</h3>
+                    
+                </div>
+                <div class="card-body">
+                    <div class="chart">
+                        <canvas id="evolution" style="min-height: 300px; height: 300px; max-height: 300px; max-width: 100%;"></canvas>
+                    </div>
+                </div>
+                <!-- /.card-body -->
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<script src="~/GenVisual/LTE/plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="~/GenVisual/LTE/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- bs-custom-file-input -->
+<script src="~/GenVisual/LTE/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
+<!-- AdminLTE App -->
+<script src="~/GenVisual/LTE/dist/js/adminlte.min.js"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="~/GenVisual/LTE/dist/js/demo.js"></script>
+<script src="~/GenVisual/js/Variables.js"></script>
+<script src="~/GenVisual/js/Operations.js"></script>
+<script src="~/GenVisual/LTE/plugins/chart.js/Chart.min.js"></script>
+<script>
+    function on() {
+        document.getElementById("overlay").style.display = "block";
+    }
+
+    function off() {
+        document.getElementById("overlay").style.display = "none";
+    }
+</script>
+
+
+<script>
+    function changeGen() {
+        var gen = document.getElementById("selectGen").value;
+        buildMap(gen);
+        setIndicators(gen);
+    }
+    function buildSelectGen() {
+
+        var content = document.getElementById("selectGen");
+        while (content.firstChild) {
+            content.removeChild(content.lastChild);
+        }
+
+        var genQtd = log["genInfos"].length;
+
+        for (var i = 1; i <= genQtd; i++) {
+            var opt = document.createElement("option");
+            opt.innerHTML = "Geração " + i;
+            opt.setAttribute("value", i - 1);
+            content.appendChild(opt);
+
+        }
+    }
+
+    function setIndicators(generation) {
+        log["genInfos"][0]
+
+        document.getElementById("minLength").innerHTML = log["genInfos"][generation]["minLength"].toFixed(0);
+        document.getElementById("avgLength").innerHTML = log["genInfos"][generation]["avgLength"].toFixed(0);
+        document.getElementById("maxLength").innerHTML = log["genInfos"][generation]["maxLength"].toFixed(0);
+        var routes = log["genInfos"][generation]["routes"];
+        document.getElementById("popDistinct").innerHTML = countDistinctRoutes(routes);
+        var variacao = ((1 - (log["genInfos"][generation]["minLength"] / log["genInfos"][0]["minLength"])) * 100).toFixed(1);
+        document.getElementById("variacao").innerHTML = variacao + " %";
+
+        var routesLength = [];
+        for (var i = 0; i < log["genInfos"][generation]["routes"].length; i++) {
+            routesLength.push(log["genInfos"][generation]["routes"][i]["length"]);
+        }
+
+        var dp = DesvioPadrao(routesLength);
+        document.getElementById("dp").innerHTML = dp.toFixed(2);
+
+    }
+
+    function buildEvolution() {
+        /* ChartJS
+            * -------
+            * Here we will create a few charts using ChartJS
+            */
+
+        //--------------
+        //- AREA CHART -
+        //--------------
+
+        // Get context with jQuery - using jQuery's .get() method.
+
+        var evCanvas = document.getElementById("evolution");
+        var pEvCanvas = evCanvas.parentElement;
+        evCanvas.remove();
+        var newEvCanvas = document.createElement("canvas");
+        newEvCanvas.setAttribute("id", "evolution");
+        newEvCanvas.style.minHeight = '300px';
+        newEvCanvas.style.height = '300px';
+        newEvCanvas.style.maxHeight = '300px';
+        newEvCanvas.style.maxWidth = '100%';
+        pEvCanvas.appendChild(newEvCanvas);
+        // <canvas id="effortChart" style="min-height: 450px; height: 450px; max-height: 450px; max-width: 100%;"></canvas>
+
+
+        var labels = [];
+        var minScore = [];
+        var maxScore = [];
+        var avgScore = [];
+        var genQtd = log["genInfos"].length;
+
+        for (var i = 0; i < genQtd; i++) {
+            labels.push(log["genInfos"][i]["generation"]);
+            minScore.push(log["genInfos"][i]["minLength"].toFixed(0));
+            maxScore.push(log["genInfos"][i]["maxLength"].toFixed(0));
+            avgScore.push(log["genInfos"][i]["avgLength"].toFixed(0));
+        }
+
+
+        var areaChartData = {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Menor Distância',
+                    backgroundColor: 'rgba(60,141,188,0.9)',
+                    borderColor: 'rgba(60,141,188,0.8)',
+                    pointRadius: false,
+                    pointColor: '#3b8bba',
+                    pointStrokeColor: 'rgba(60,141,188,1)',
+                    pointHighlightFill: '#fff',
+                    pointHighlightStroke: 'rgba(60,141,188,1)',
+                    data: minScore
+                },
+                {
+                    label: 'Média',
+                    backgroundColor: 'rgba(210, 214, 222, 1)',
+                    borderColor: 'rgba(210, 214, 222, 1)',
+                    pointRadius: false,
+                    pointColor: 'rgba(210, 214, 222, 1)',
+                    pointStrokeColor: '#c1c7d1',
+                    pointHighlightFill: '#fff',
+                    pointHighlightStroke: 'rgba(220,220,220,1)',
+                    data: avgScore
+                },
+                {
+                    label: 'Maior',
+                    backgroundColor: 'rgba(210, 214, 222, 1)',
+                    borderColor: 'rgba(210, 214, 222, 1)',
+                    pointRadius: false,
+                    pointColor: 'rgba(210, 214, 222, 1)',
+                    pointStrokeColor: '#c1c7d1',
+                    pointHighlightFill: '#fff',
+                    pointHighlightStroke: 'rgba(220,220,220,1)',
+                    data: maxScore
+                }
+            ]
+        }
+
+        var areaChartOptions = {
+            maintainAspectRatio: false,
+            responsive: true,
+            legend: {
+                display: false
+            },
+            scales: {
+                xAxes: [{
+                    gridLines: {
+                        display: false,
+                    }
+                }],
+                yAxes: [{
+                    gridLines: {
+                        display: false,
+                    }
+                }]
+            }
+        }
+
+        // This will get the first returned node in the jQuery collection.
+
+
+        //-------------
+        //- LINE CHART -
+        //--------------
+
+        var lineChartCanvas = $('#evolution').get(0).getContext('2d')
+        var lineChartOptions = jQuery.extend(true, {}, areaChartOptions)
+        var lineChartData = jQuery.extend(true, {}, areaChartData)
+        lineChartData.datasets[0].fill = false;
+        lineChartData.datasets[1].fill = false;
+        lineChartData.datasets[2].fill = false;
+        lineChartOptions.datasetFill = false
+
+        var lineChart = new Chart(lineChartCanvas, {
+            type: 'line',
+            data: lineChartData,
+            options: lineChartOptions
+        })
+
+        //-------------
+        //- DONUT CHART -
+        //-------------
+        // Get context with jQuery - using jQuery's .get() method.
+    }
+    function buildMap(generation) {
+        var canvasmap = document.getElementById("MapCanvas");
+        var ctx = canvasmap.getContext("2d");
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+        var targetsQtd = Object.keys(log["map"]["targets"]).length;
+        for (var i = 1; i <= targetsQtd; i++) {
+            ctx.beginPath();
+            var x = log["map"]["targets"][i]["coordenates"]["x"] * canvasWidth / mapMilesRangeX;
+            var y = log["map"]["targets"][i]["coordenates"]["y"] * canvasHeight / mapMilesRangeY;
+            ctx.arc(x, y, 5, 0, 2 * Math.PI);
+            ctx.fillStyle = "#000000";
+            ctx.fill();
+        }
+
+
+        var routes = log["genInfos"][generation]["routes"];
+        var shortestRoute = findShortestRoute(routes);
+
+        for (var i = 0; i < shortestRoute["targetsPoint"].length - 1; i++) {
+            var a = shortestRoute["targetsPoint"][i];
+            var b = shortestRoute["targetsPoint"][i + 1];
+
+            var xa = log["map"]["targets"][a]["coordenates"]["x"] * canvasWidth / mapMilesRangeX;
+            var ya = log["map"]["targets"][a]["coordenates"]["y"] * canvasHeight / mapMilesRangeY;
+            var xb = log["map"]["targets"][b]["coordenates"]["x"] * canvasWidth / mapMilesRangeX;
+            var yb = log["map"]["targets"][b]["coordenates"]["y"] * canvasHeight / mapMilesRangeY;
+
+            ctx.beginPath();
+            ctx.moveTo(xa, ya);
+            ctx.lineTo(xb, yb);
+            ctx.stroke();
+
+        }
+
+        
+
+    }
+
+
+    function Execute(){
+
+        on();
+        var target = document.getElementById("target").value;
+        var population = document.getElementById("population").value;
+        var generation = document.getElementById("generation").value;
+        var mutation = document.getElementById("mutation").value;
+
+        $.ajax(
+            {
+                type: 'POST',
+                url: 'GenVisual/Gen/Execute?target=' + target + '&population=' + population + '&generations=' + generation + '&mutation=' + mutation,
+                dataType: 'json',
+                cache: false,
+                async: true,
+                success: function (data) {
+
+                    log = data;
+                    buildMap(log["genInfos"].length - 1);
+                    buildEvolution();
+                    buildSelectGen();
+                    document.getElementById("selectGen").value = log["genInfos"].length - 1;
+                    setIndicators(log["genInfos"].length - 1);
+
+                    off();
+                }
+
+            });
+
+
+    }
+</script>
+

@@ -1,0 +1,11 @@
+C:\Users\artur\source\repos\MostEficientRoute\MostEficientRoute\bin\Debug\netcoreapp2.1\MostEficientRoute.deps.json
+C:\Users\artur\source\repos\MostEficientRoute\MostEficientRoute\bin\Debug\netcoreapp2.1\MostEficientRoute.runtimeconfig.json
+C:\Users\artur\source\repos\MostEficientRoute\MostEficientRoute\bin\Debug\netcoreapp2.1\MostEficientRoute.runtimeconfig.dev.json
+C:\Users\artur\source\repos\MostEficientRoute\MostEficientRoute\bin\Debug\netcoreapp2.1\MostEficientRoute.dll
+C:\Users\artur\source\repos\MostEficientRoute\MostEficientRoute\bin\Debug\netcoreapp2.1\MostEficientRoute.pdb
+C:\Users\artur\source\repos\MostEficientRoute\MostEficientRoute\obj\Debug\netcoreapp2.1\MostEficientRoute.csprojAssemblyReference.cache
+C:\Users\artur\source\repos\MostEficientRoute\MostEficientRoute\obj\Debug\netcoreapp2.1\MostEficientRoute.csproj.CoreCompileInputs.cache
+C:\Users\artur\source\repos\MostEficientRoute\MostEficientRoute\obj\Debug\netcoreapp2.1\MostEficientRoute.AssemblyInfoInputs.cache
+C:\Users\artur\source\repos\MostEficientRoute\MostEficientRoute\obj\Debug\netcoreapp2.1\MostEficientRoute.AssemblyInfo.cs
+C:\Users\artur\source\repos\MostEficientRoute\MostEficientRoute\obj\Debug\netcoreapp2.1\MostEficientRoute.dll
+C:\Users\artur\source\repos\MostEficientRoute\MostEficientRoute\obj\Debug\netcoreapp2.1\MostEficientRoute.pdb
