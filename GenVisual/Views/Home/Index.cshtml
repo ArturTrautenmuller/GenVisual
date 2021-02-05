@@ -46,17 +46,18 @@
     <div id="DataDiv" style="width:15%;margin-left:10px">
 
         <label>Qtde Pontos: </label><br />
-        <input id="target" style="width:70%" value="10" type="number" step="1" min="2" max="20" class="form-control" /><br />
+        <input id="target" style="width:70%" value="10" type="number" step="1" min="2" max="25" class="form-control" /><br />
         <label>População: </label><br />
         <input id="population" style="width:70%" value="100" type="number" step="1" min="5" max="500" class="form-control" /><br />
         <label>N° Gerações: </label><br />
-        <input id="generation" style="width:70%" value="100" type="number" step="1" min="5" max="100" class="form-control" /><br />
+        <input id="generation" style="width:70%" value="100" type="number" step="1" min="5" max="200" class="form-control" /><br />
         <label>Taxa de Mutação (%): </label><br />
         <input id="mutation" style="width:70%" value="10" type="number" step="1" min="1" max="100" class="form-control" /><br />
-
+        <div style="display:flex">
         <button class="btn btn-primary" onclick="Execute()">Executar</button>
 
-
+        <button class="btn btn-primary" onclick="ExecuteCustom()" style="margin-left:12px">Atualizar</button>
+            </div>
 
     </div>
     <div id="Analytics" style="width:80%;margin-left:10px">
@@ -65,7 +66,10 @@
                 <canvas id="MapCanvas" width="300" height="300" style="border:1px solid #000000"></canvas>
             </div>
             <div style="margin-left:12px;width:800px">
-                <select id="selectGen" onchange="changeGen()" class="form-control" style="width:200px"></select>
+                <div style="display:flex">
+                    <select id="selectGen" onchange="changeGen()" class="form-control" style="width:200px"></select>
+                    <button id="playButton" class="btn btn-block btn-success" style="margin-left:15px;width:50px" onclick="PlaySlide()"><i id="playIcon" class="fas fa-play"></i></button>
+                </div>
                 <br />
 
                 <div class="row">
@@ -192,6 +196,7 @@
 <script src="~/GenVisual/LTE/dist/js/demo.js"></script>
 <script src="~/GenVisual/js/Variables.js"></script>
 <script src="~/GenVisual/js/Operations.js"></script>
+<script src="~/GenVisual/js/CanvasController.js"></script>
 <script src="~/GenVisual/LTE/plugins/chart.js/Chart.min.js"></script>
 <script>
     function on() {
@@ -208,7 +213,9 @@
     function changeGen() {
         var gen = document.getElementById("selectGen").value;
         buildMap(gen);
-        setIndicators(gen);
+        if (gen != -1) {
+            setIndicators(gen);
+        }
     }
     function buildSelectGen() {
 
@@ -218,6 +225,11 @@
         }
 
         var genQtd = log["genInfos"].length;
+
+        var opt = document.createElement("option");
+        opt.innerHTML = "Mapa";
+        opt.setAttribute("value",-1);
+        content.appendChild(opt);
 
         for (var i = 1; i <= genQtd; i++) {
             var opt = document.createElement("option");
@@ -383,34 +395,69 @@
             ctx.beginPath();
             var x = log["map"]["targets"][i]["coordenates"]["x"] * canvasWidth / mapMilesRangeX;
             var y = log["map"]["targets"][i]["coordenates"]["y"] * canvasHeight / mapMilesRangeY;
-            ctx.arc(x, y, 5, 0, 2 * Math.PI);
+            ctx.arc(x, y, circleRadius, 0, 2 * Math.PI);
             ctx.fillStyle = "#000000";
             ctx.fill();
         }
 
+        if (generation != -1) {
+            var routes = log["genInfos"][generation]["routes"];
+            var shortestRoute = findShortestRoute(routes);
 
-        var routes = log["genInfos"][generation]["routes"];
-        var shortestRoute = findShortestRoute(routes);
+            for (var i = 0; i < shortestRoute["targetsPoint"].length - 1; i++) {
+                var a = shortestRoute["targetsPoint"][i];
+                var b = shortestRoute["targetsPoint"][i + 1];
 
-        for (var i = 0; i < shortestRoute["targetsPoint"].length - 1; i++) {
-            var a = shortestRoute["targetsPoint"][i];
-            var b = shortestRoute["targetsPoint"][i + 1];
+                var xa = log["map"]["targets"][a]["coordenates"]["x"] * canvasWidth / mapMilesRangeX;
+                var ya = log["map"]["targets"][a]["coordenates"]["y"] * canvasHeight / mapMilesRangeY;
+                var xb = log["map"]["targets"][b]["coordenates"]["x"] * canvasWidth / mapMilesRangeX;
+                var yb = log["map"]["targets"][b]["coordenates"]["y"] * canvasHeight / mapMilesRangeY;
 
-            var xa = log["map"]["targets"][a]["coordenates"]["x"] * canvasWidth / mapMilesRangeX;
-            var ya = log["map"]["targets"][a]["coordenates"]["y"] * canvasHeight / mapMilesRangeY;
-            var xb = log["map"]["targets"][b]["coordenates"]["x"] * canvasWidth / mapMilesRangeX;
-            var yb = log["map"]["targets"][b]["coordenates"]["y"] * canvasHeight / mapMilesRangeY;
+                ctx.beginPath();
+                ctx.moveTo(xa, ya);
+                ctx.lineTo(xb, yb);
+                ctx.stroke();
 
-            ctx.beginPath();
-            ctx.moveTo(xa, ya);
-            ctx.lineTo(xb, yb);
-            ctx.stroke();
-
+            }
         }
 
         
 
     }
+
+    function PlaySlide() {
+        document.getElementById("playButton").setAttribute("onclick", "StopSlide()");
+        document.getElementById("playButton").setAttribute("class", "btn btn-block btn-danger");
+        document.getElementById("playIcon").setAttribute("class", "fas fa-stop");
+        playSlideEvent = setTimeout(PassSlide, 200);
+    }
+
+    function StopSlide() {
+        document.getElementById("playButton").setAttribute("onclick", "PlaySlide()");
+        document.getElementById("playButton").setAttribute("class", "btn btn-block btn-success");
+        document.getElementById("playIcon").setAttribute("class", "fas fa-play");
+        clearTimeout(playSlideEvent);
+    }
+
+    function PassSlide() {
+        var genQtd = log["genInfos"].length;
+        var cSlide = parseInt(document.getElementById("selectGen").value);
+        if (cSlide == genQtd - 1) {
+            StopSlide();
+            return;
+        }
+        cSlide++;
+        document.getElementById("selectGen").value = cSlide;
+        buildMap(cSlide);
+        if (cSlide != -1) {
+            setIndicators(cSlide);
+        }
+        playSlideEvent = setTimeout(PassSlide, 500);
+
+    }
+
+   
+
 
 
     function Execute(){
@@ -431,14 +478,48 @@
                 success: function (data) {
 
                     log = data;
-                    buildMap(log["genInfos"].length - 1);
+                    buildMap(-1);
                     buildEvolution();
                     buildSelectGen();
-                    document.getElementById("selectGen").value = log["genInfos"].length - 1;
+                    document.getElementById("selectGen").value = -1;
                     setIndicators(log["genInfos"].length - 1);
-
+                    customMap = JSON.parse(JSON.stringify(log.map));
                     off();
                 }
+
+            });
+
+
+    }
+
+    function ExecuteCustom() {
+
+        on();
+        var target = document.getElementById("target").value;
+        var population = document.getElementById("population").value;
+        var generation = document.getElementById("generation").value;
+        var mutation = document.getElementById("mutation").value;
+
+        $.ajax(
+            {
+                type: 'POST',
+                url: 'GenVisual/Gen/ExecuteCustom?target=' + target + '&population=' + population + '&generations=' + generation + '&mutation=' + mutation,
+                dataType: 'json',
+                cache: false,
+                async: true,
+                contentType: "application/json",
+                success: function (data) {
+
+                    log = data;
+                    buildMap(-1);
+                    buildEvolution();
+                    buildSelectGen();
+                    document.getElementById("selectGen").value = -1;
+                    setIndicators(log["genInfos"].length - 1);
+                    customMap = JSON.parse(JSON.stringify(log.map));
+                    off();
+                },
+                data: JSON.stringify(log.map)
 
             });
 

@@ -34,5 +34,31 @@ namespace GenVisual.Controllers
 
             return log;
         }
+
+        public Log ExecuteCustom([FromQuery(Name = "target")] int target, [FromQuery(Name = "population")] int population, [FromQuery(Name = "generations")] int generations, [FromQuery(Name = "mutation")] int mutation,[FromBody] Map buildMap)
+        {
+            Log log = new Log();
+            Core core = new Core(target, population, (double)mutation / 100);
+            core.Map = buildMap;
+            core.GeneratePopulation();
+            log.Map = core.Map;
+            log.SaveGenStatus(core.Population);
+
+            for (int i = 0; i < generations - 1; i++)
+            {
+                core.Population.Routes = core.Population.Routes.OrderBy(r => r.Length).ToList();
+                core.Population.Routes = core.Population.Routes.Take(core.Population.Routes.Count / 2).ToList();
+
+                core.Population.Routes.AddRange(core.CrossOverAll(core.Population.Routes));
+
+                core.Population.Generation++;
+
+                log.SaveGenStatus(core.Population);
+            }
+
+
+
+            return log;
+        }
     }
 }
